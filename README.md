@@ -137,8 +137,97 @@ Gate::define('create.company', function (User $user) {
 });
 ```
 
+### **Validation**
+For the implementing validation, i use Form Requests validation because it's more great for implementing clean code and make controller more simple, the normal cases of validation are derived directly from the application's requirements. Below is a detailed explanation of how I approached validation based on reading and analyzing the requirements.
+
+## Normal Cases of Validation
+
+### 1. **Required Fields**
+Ensures that mandatory fields are not left empty. Missing fields may lead to incomplete data and unexpected errors.
+```php
+'name' => 'required',
+'email' => 'required|email|unique',
+'password' => 'required|min:8',
+```
+
+### 2. **Data Type Validation**
+Enforces that fields contain values of the expected data type.
+```php
+'email' => 'required|email'
+```
+
+### 3. **Length and Size Validation**
+Prevents excessively short or long inputs to align with business rules and database constraints.
+```php
+'username' => 'required|string|min:8',
+'password' => 'required|string|min:8',
+```
+
+### 4. **Uniqueness Check**
+Validates that certain fields, such as `email` or `username`, are unique to avoid conflicts in the database.
+```php
+'email' => 'required|email|unique:users,email',
+```
+
+### 5. **Value Range Validation**
+Ensures that numeric or enum-like values fall within acceptable ranges.
+```php
+'role_id' => 'required|in:1,2,3',
+```
+
+---
+
+## Why These Validations Were Chosen
+
+### 1. **Data Integrity**
+Validations prevent invalid or incomplete data from being stored in the database.
+
+### 2. **User Experience**
+By catching errors early in the form submission process, users receive immediate feedback on their input.
+
+### 3. **Security**
+Protects the application from harmful inputs such as SQL injection, malicious file uploads, or other attack vectors.
+
+### 4. **Business Logic**
+Ensures the submitted data adheres to business rules, avoiding logical inconsistencies.
+
+---
+
+## Example Form Request Validation in Laravel
+
+### Creating the Form Request
+Use the Artisan command to create a Form Request:
+```bash
+php artisan make:request UserRequest
+```
+
+### Defining Validation Rules
+In the `rules` method of the `UserRequest` class, define the validation logic:
+```php
+public function rules()
+{
+    return [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8',
+        'role_id' => 'required|string|in:1,2,3',
+    ];
+}
+```
+
+### Applying the Form Request
+In the controller, use the Form Request as a type-hinted parameter:
+```php
+public function store(UserRequest $request)
+{
+    // Validation is automatically applied here
+    $validatedData = $request->validated();
+
+    // Process the validated data
+    User::create($validatedData);
+}
+```
 ---
 
 ## **Conclusion**
 Follow the steps above to set up and explore the application. If you encounter any issues, please send me an email to nasrulmuhammad676@gmail.com.
-
