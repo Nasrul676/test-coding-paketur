@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /vendor/
 node_modules/
 npm-debug.log
@@ -53,4 +52,3 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
->>>>>>> 9c244f4 (first commit)
