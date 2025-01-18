@@ -88,7 +88,7 @@ Follow these steps to set up and run the project on your local machine.
    http://127.0.0.1:8000
    ```
 
-### **5. Having problem with aunthentication ?**
+### **6. Having problem with aunthentication?**
 1. First clear cache with command:
    ```bash
    php artisan cache:clear
@@ -115,6 +115,9 @@ Follow these steps to set up and run the project on your local machine.
 
 ### **2. JWT-Auth**
 - **Purpose**: Handles token-based authentication.
+
+### **3. drawSQL**
+- **Purpose**: Design the erd structure.
 
 ---
 ## **Middleware, Policies, and Gates**
