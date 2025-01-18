@@ -23,16 +23,14 @@ class ManagerController
                 return $response;
             }
 
-            $manager = Manager::query();
-
-            if($request->filled('name')){
-                $manager = $manager->where('name', 'like', '%'.$request->name.'%');
-            }
-            if($request->filled('sort')){
-                $manager = $manager->orderBy('name', $request->sort);
-            }
-
-            $manager = $manager->paginate(10);
+            $manager = Manager::query()
+                ->when($request->filled('name'), function ($query) use ($request) {
+                    return $query->where('name', 'like', '%' . $request->name . '%');
+                })
+                ->when($request->filled('sort'), function ($query) use ($request) {
+                    return $query->orderBy('name', $request->sort);
+                })
+                ->paginate(10);
             
             return $this->jsonResponse('Managers retrieved successfully', $manager->toArray());
         } catch (\Exception $e) {

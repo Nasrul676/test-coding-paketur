@@ -29,15 +29,14 @@ class CompanyController extends Controller
                 return $response;
             }
 
-            $companies = Company::query();
-
-            if($request->filled('name')){
-                $companies = $companies->where('name', 'like', '%'.$request->name.'%');
-            }
-            if($request->filled('sort')){
-                $companies = $companies->orderBy('name', $request->sort);
-            }
-            $companies = $companies->paginate(10);
+            $companies = Company::query()
+                ->when($request->filled('name'), function ($query) use ($request) {
+                    return $query->where('name', 'like', '%' . $request->name . '%');
+                })
+                ->when($request->filled('sort'), function ($query) use ($request) {
+                    return $query->orderBy('name', $request->sort);
+                })
+                ->paginate(10);
             
             return $this->jsonResponse('Companies retrieved successfully', $companies->toArray());
         } catch (\Exception $e) {
@@ -80,39 +79,34 @@ class CompanyController extends Controller
             }
 
             $validatedData = $request->validated();
-            
-            $result = DB::transaction(function () use ($validatedData) {
-                // Create company
-                $createCompany = Company::create($validatedData);
 
-                // Create manager role
-                $role = Role::where('name', 'manager')->first();
+            $result =  DB::transaction(function () use ($validatedData) {
+                $company = Company::create($validatedData);
+                
+                $managerRole = Role::where('name', 'manager')->firstOrFail();
+                
+                $company->roles()->attach($managerRole);
 
-                $managerRole = $createCompany->roles()->attach($role->id);
-
-                //create manager data for company
-                $manager = $createCompany->managers()->create([
-                    'company_id' => $createCompany->id,
-                    'name' => $validatedData['name'],
-                    'phone' => $validatedData['phone'],
-                    'created_at' => now()
-                ]);
-
-                // Create manager account
-                $managerAccount = User::create([
+                // Create manager account with cleaner attribute handling
+                $user = User::create([
                     'name' => $validatedData['name'],
                     'email' => $validatedData['email'],
                     'password' => Hash::make(self::DEFAULT_PASSWORD),
-                    'role_id' => $role->id
+                    'role_id' => $managerRole->id
+                ]);
+                
+                // Create manager using relationship
+                $manager = $company->managers()->create([
+                    'name' => $validatedData['name'],
+                    'phone' => $validatedData['phone'],
+                    'user_id' => $user->id
                 ]);
 
-                $mapData = [
-                    'name' => $managerAccount->name,
-                    'email' => $managerAccount->email,
+                return [
+                    'name' => $user->name,
+                    'email' => $user->email,
                     'password' => self::DEFAULT_PASSWORD,
                 ];
-
-                return $mapData;
             });
 
             return $this->jsonResponse('Company created successfully', $result, 201);

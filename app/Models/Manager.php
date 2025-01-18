@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Company;
+use App\Models\User;
 
 class Manager extends Model
 {
@@ -21,6 +22,7 @@ class Manager extends Model
         'phone',
         'address',
         'company_id',
+        'user_id',
     ];
 
     /**
@@ -31,5 +33,15 @@ class Manager extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    
+    /**
+     * Get the user that owns the Manager
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

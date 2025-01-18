@@ -79,8 +79,8 @@ class EmployeeController extends Controller
             }
 
             //get company id from authenticated manager account
-            $managerCompanyId = Manager::find(auth()->user()->id)->company_id;
-
+            $managerCompanyId = auth()->user()->manager->company_id;
+            
             $mapData = [
                 'company_id' => $managerCompanyId,
                 'name' => $data['name'],
