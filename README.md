@@ -71,7 +71,7 @@ Follow these steps to set up and run the project on your local machine.
    ```bash
    php artisan migrate
    ```
-2. (Optional) Seed the database with initial data:
+2. Seed the database with to create the default account, roles and permission data:
    ```bash
    php artisan db:seed
    ```
